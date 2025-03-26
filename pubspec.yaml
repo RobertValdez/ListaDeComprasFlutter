@@ -1,5 +1,5 @@
 name: lista_de_compras
-description: "A new Flutter project."
+description: "App para realizar compras en supermercados grandes en menos tiempo."
 publish_to: 'none'
 version: 0.1.0
 
@@ -20,3 +20,5 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  assets:
+    - assets/maps/lista_compras.mbtiles
