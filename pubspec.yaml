@@ -10,8 +10,18 @@ dependencies:
   flutter:
     sdk: flutter
   get: ^4.6.6
-  flutter_map: ^6.1.0
+        # this package:
+  mbtiles: ^0.4.0
+  # coordinates will be returned as `LatLng`, include the following package 
+  # if you want to work with them.
   latlong2: ^0.9.0
+  # sqlite libraries (in case not otherwise bundled)
+  sqlite3_flutter_libs: ^0.5.18
+  flutter_map: ^6.0.0
+  flutter_map_mbtiles: ^1.0.4
+  path_provider: ^2.0.15
+  sqflite: ^2.4.2
+  geolocator: ^10.1.0
 
 dev_dependencies:
   flutter_test:
@@ -21,4 +31,4 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   assets:
-    - assets/maps/lista_compras.mbtiles
+    - assets/maps/
