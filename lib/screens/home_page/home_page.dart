@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:flutter_map/flutter_map.dart';
-import 'package:latlong2/latlong.dart';
+import 'package:lista_de_compras/screens/maint_products/maint_product_add.dart';
+import 'package:lista_de_compras/screens/maint_products/maint_product_edit.dart';
+import 'package:lista_de_compras/screens/maps_show/map_screen_show.dart';
 
 class Product {
   String name;
@@ -77,7 +78,14 @@ class ShoppingListScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Lista de Compras"),
+        title: Text(
+          "Lista de compras",
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Colors.black,
+            letterSpacing: 2.5,
+          ),
+        ),
         actions: [
           Container(
             margin: EdgeInsets.only(right: 8.0),
@@ -85,20 +93,30 @@ class ShoppingListScreen extends StatelessWidget {
               onPressed: () {},
               icon: Icon(Icons.import_export),
               iconSize: 30.0,
+              color: Colors.black,
             ),
           ),
         ],
+        backgroundColor: const Color.fromARGB(255, 107, 196, 110),
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(
+            bottomLeft: Radius.circular(10),
+            bottomRight: Radius.circular(10),
+          ),
+        ),
       ),
       body: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.all(5.0),
             child: TextField(
               decoration: InputDecoration(
                 hintText: "Buscar producto...",
                 prefixIcon: Icon(Icons.search),
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
                 ),
               ),
               onChanged: controller.updateSearchQuery,
@@ -125,7 +143,6 @@ class ShoppingListScreen extends StatelessWidget {
                 padding: const EdgeInsets.only(
                   left: 16,
                   right: 16,
-                  top: 8.0,
                   bottom: 8.0,
                 ),
                 child: ListView(
@@ -134,9 +151,7 @@ class ShoppingListScreen extends StatelessWidget {
                         return Container(
                           margin: EdgeInsets.only(bottom: 5.0),
                           decoration: BoxDecoration(
-                            border: Border.all(
-                              color: Colors.black, width: 1.0
-                            ),
+                            border: Border.all(color: Colors.black, width: 1.0),
                             borderRadius: BorderRadius.circular(8.0),
                           ),
                           child: Column(
@@ -156,28 +171,45 @@ class ShoppingListScreen extends StatelessWidget {
                                 int index = controller.products.indexOf(
                                   product,
                                 );
-                                return ListTile(
-                                  leading: Checkbox(
-                                    value: product.isChecked,
-                                    onChanged:
-                                        (value) =>
-                                            controller.toggleCheck(index),
-                                  ),
-                                  title: GestureDetector(
+                                return Material(
+                                  color: Colors.transparent,
+                                  child: InkWell(
                                     onTap: () {
-                                      print("Prueba");
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder:
+                                              (context) =>
+                                                  const MaintProductEdit(),
+                                        ),
+                                      );
                                     },
-                                    child: Text(product.name),
-                                  ),
-                                  trailing: ElevatedButton(
-                                    onPressed:
-                                        product.canView
-                                            ? () => _showProductDetails(
-                                              context,
-                                              product,
-                                            )
-                                            : null,
-                                    child: Text("Ver"),
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(
+                                        right: 2.0,
+                                        bottom: 5.0,
+                                      ),
+                                      child: ListTile(
+                                        leading: Checkbox(
+                                          value: product.isChecked,
+                                          onChanged:
+                                              (value) =>
+                                                  controller.toggleCheck(index),
+                                          activeColor: Colors.green,
+                                        ),
+                                        title: Text(product.name),
+                                        trailing: ElevatedButton(
+                                          onPressed:
+                                              product.canView
+                                                  ? () => _showProductDetails(
+                                                    context,
+                                                    product,
+                                                  )
+                                                  : null,
+                                          child: Icon(Icons.remove_red_eye),
+                                        ),
+                                      ),
+                                    ),
                                   ),
                                 );
                               }),
@@ -192,7 +224,15 @@ class ShoppingListScreen extends StatelessWidget {
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => _showAddProductDialog(context),
+        onPressed:
+            () => {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const MaintProductAdd(),
+                ),
+              ),
+            },
         child: Icon(Icons.add),
       ),
     );
@@ -229,6 +269,7 @@ class ShoppingListScreen extends StatelessWidget {
   }
 
   /// Método para agregar un producto
+  // ignore: unused_element
   void _showAddProductDialog(BuildContext context) {
     TextEditingController productController = TextEditingController();
     TextEditingController categoryController = TextEditingController();
@@ -283,186 +324,6 @@ class ShoppingListScreen extends StatelessWidget {
               ),
             ],
           ),
-    );
-  }
-}
-
-class MapScreen extends StatelessWidget {
-  const MapScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: FlutterMap(
-        options: const MapOptions(
-          initialCenter: LatLng(
-            18.222610,
-            -71.124255,
-          ), // Centro inicial del mapa
-          initialZoom: 20, // Nivel de zoom inicial
-          interactionOptions: InteractionOptions(
-            flags: InteractiveFlag.all,
-          ), // Habilitar interactividad
-        ),
-        children: [
-          // Capa de mosaicos (tiles) de OpenStreetMap
-          TileLayer(
-            urlTemplate: "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
-            userAgentPackageName:
-                'com.example.app', // Ajuste recomendado para evitar errores
-          ),
-          // Capa de marcadores
-          MarkerLayer(
-            markers: _buildMarkers(
-              context,
-            ), // Se usa una función para generar los marcadores
-          ),
-        ],
-      ),
-    );
-  }
-
-  // Función para generar los marcadores
-  List<Marker> _buildMarkers(BuildContext context) {
-    return [
-      _createMarker(
-        context,
-        LatLng(18.222610, -71.124255),
-        "Información del Producto",
-        "Saco de Arroz Campo, 5 sacos de 20 lbs.",
-        Colors.red,
-        false,
-      ),
-      _createMarker(
-        context,
-        LatLng(18.222081, -71.124362),
-        "Información del Producto",
-        "Salsa de Tomate #5 latas Pequeñas.",
-        Colors.red,
-        false,
-      ),
-
-      _createMarker(
-        context,
-        LatLng(18.222005, -71.124201),
-        "Información del Producto",
-        "Salsa de Tomate #5 latas Pequeñas.",
-        Colors.green,
-        true,
-      ),
-
-      _createMarker(
-        context,
-        LatLng(18.222336, -71.124163),
-        "Información del Producto",
-        "Salsa de Tomate #5 latas Pequeñas.",
-        Colors.green,
-        true,
-      ),
-    ];
-  }
-
-  // Función para crear un marcador con información
-  Marker _createMarker(
-    BuildContext context,
-    LatLng point,
-    String title,
-    String content,
-    Color color,
-    bool checkedList,
-  ) {
-    return Marker(
-      point: point,
-      width: 40,
-      height: 40,
-      child: GestureDetector(
-        onTap: () {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              backgroundColor: Colors.transparent, // Fondo transparente
-              elevation: 0,
-              margin: const EdgeInsets.only(
-                bottom: 650,
-                left: 20,
-                right: 20,
-              ), // Margen personalizado
-              behavior: SnackBarBehavior.floating,
-              duration: const Duration(seconds: 60),
-              content: Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Colors.grey[900], // Color de fondo del snackbar
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    // Avatar circular con icono
-                    CircleAvatar(
-                      radius: 20,
-                      backgroundColor:
-                          Colors.blue[100], // Color del fondo del avatar
-                      child: Icon(
-                        checkedList
-                            ? Icons.check_circle
-                            : Icons.info, // Ícono dinámico según estado
-                        color: Colors.white,
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    // Texto del mensaje
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            title,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          Text(
-                            content,
-                            style: const TextStyle(color: Colors.grey),
-                          ),
-                        ],
-                      ),
-                    ),
-                    // Botón de acción
-                    TextButton(
-                      onPressed: () {
-                        ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                      },
-                      child: const Text(
-                        "Cerrar",
-                        style: TextStyle(color: Colors.green),
-                      ),
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                      },
-                      child: const Text(
-                        "Marcar",
-                        style: TextStyle(color: Colors.green),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          );
-        },
-        child: Icon(
-          checkedList
-              ? Icons.where_to_vote
-              : Icons.where_to_vote, // Ícono dinámico
-          color: color,
-          size: 40,
-        ),
-      ),
     );
   }
 }
