@@ -16,7 +16,7 @@ El propósito principal de esta App es agilizar el proceso de compra de producto
 
 La aplicación no está terminada aun y la misma cuenta con cierta documentación a lo largo del código.
 
-English:
+# English:
 
 Shopping List is an open-source project built with Flutter, designed to manage one or more shopping lists for products. Its purpose is, on one hand, to have a description of each product along with its images, and on the other hand, to locate those products within the stock of a store or supermarket.
 
