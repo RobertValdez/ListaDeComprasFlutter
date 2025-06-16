@@ -1,18 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:lista_de_compras/screens/maint_products/maint_product_add.dart';
-import 'package:lista_de_compras/screens/maint_products/maint_product_edit.dart';
 import 'package:lista_de_compras/screens/maps_show/map_screen_show.dart';
 
 class Product {
   String name;
   String category;
+  String altname;
+  String cantidad;
+  String ubicacion;
   bool isChecked;
   bool canView;
 
   Product({
     required this.name,
     required this.category,
+    required this.altname,
+    required this.cantidad,
+    this.ubicacion = "",
     this.isChecked = false,
     this.canView = true,
   });
@@ -22,10 +27,23 @@ class ShoppingListController extends GetxController {
   var products = <Product>[].obs;
   var searchQuery = ''.obs;
 
-  void addProduct(String name, String category) {
-    if (!products.any((p) => p.name.toLowerCase() == name.toLowerCase())) {
-      products.add(Product(name: name, category: category));
-    }
+  void addProduct(
+    BuildContext context,
+    String name,
+    String category,
+    String altname,
+    String cantidad,
+    String ubicacion,
+  ) {
+    products.add(
+      Product(
+        name: name,
+        category: category,
+        altname: altname,
+        cantidad: cantidad,
+        ubicacion: ubicacion,
+      ),
+    );
   }
 
   void toggleCheck(int index) {
@@ -81,19 +99,36 @@ class ShoppingListScreen extends StatelessWidget {
         title: Text(
           "Lista de compras",
           style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: Colors.black,
+            fontSize: 25,
+            color: Colors.white,
+            shadows: [
+              Shadow(
+                blurRadius: 6,
+                offset: Offset(2, 2),
+                color: Colors.black45,
+              ),
+            ],
             letterSpacing: 2.5,
           ),
         ),
         actions: [
           Container(
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withAlpha((255 * 0.07).round()),
+                  blurRadius: 12,
+                  offset: Offset(2, 2),
+                ),
+              ],
+            ),
             margin: EdgeInsets.only(right: 8.0),
             child: IconButton(
               onPressed: () {},
-              icon: Icon(Icons.import_export),
+              icon: Icon(Icons.settings),
               iconSize: 30.0,
-              color: Colors.black,
+              color: const Color.fromARGB(255, 218, 238, 220),
             ),
           ),
         ],
@@ -151,7 +186,7 @@ class ShoppingListScreen extends StatelessWidget {
                         return Container(
                           margin: EdgeInsets.only(bottom: 5.0),
                           decoration: BoxDecoration(
-                            border: Border.all(color: Colors.black, width: 1.0),
+                            border: Border.all(color: Colors.grey, width: 1.0),
                             borderRadius: BorderRadius.circular(8.0),
                           ),
                           child: Column(
@@ -174,15 +209,15 @@ class ShoppingListScreen extends StatelessWidget {
                                 return Material(
                                   color: Colors.transparent,
                                   child: InkWell(
-                                    onTap: () {
+                                    onTap: () {/*
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
                                           builder:
                                               (context) =>
-                                                  const MaintProductEdit(),
+                                                   const MaintProductEdit(),
                                         ),
-                                      );
+                                      );*/
                                     },
                                     child: Padding(
                                       padding: const EdgeInsets.only(
@@ -229,7 +264,25 @@ class ShoppingListScreen extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => const MaintProductAdd(),
+                  builder:
+                      (context) => MaintProductAdd(
+                        onAddProduct: (
+                          productName,
+                          category,
+                          altname,
+                          cantidad,
+                          ubicacion,
+                        ) {
+                          controller.addProduct(
+                            context,
+                            productName,
+                            category,
+                            altname,
+                            cantidad,
+                            ubicacion,
+                          );
+                        },
+                      ),
                 ),
               ),
             },
@@ -262,65 +315,6 @@ class ShoppingListScreen extends StatelessWidget {
               TextButton(
                 onPressed: () => Navigator.pop(context),
                 child: Text("Cerrar"),
-              ),
-            ],
-          ),
-    );
-  }
-
-  /// Método para agregar un producto
-  // ignore: unused_element
-  void _showAddProductDialog(BuildContext context) {
-    TextEditingController productController = TextEditingController();
-    TextEditingController categoryController = TextEditingController();
-    showDialog(
-      context: context,
-      builder:
-          (context) => AlertDialog(
-            title: Text("Agregar Producto"),
-            content: Column(
-              //mainAxisSize sirve para especificar el tamaño total del Widget
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: TextField(
-                    controller: productController,
-                    decoration: InputDecoration(
-                      hintText: "Nombre del producto",
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: TextField(
-                    controller: categoryController,
-                    decoration: InputDecoration(
-                      hintText: "Categoría",
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: Text("Cancelar"),
-              ),
-              TextButton(
-                onPressed: () {
-                  if (productController.text.isNotEmpty &&
-                      categoryController.text.isNotEmpty) {
-                    controller.addProduct(
-                      productController.text,
-                      categoryController.text,
-                    );
-                    Navigator.pop(context);
-                  }
-                },
-                child: Text("Agregar"),
               ),
             ],
           ),

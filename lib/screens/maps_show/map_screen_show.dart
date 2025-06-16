@@ -149,14 +149,16 @@ class MapScreenState extends State<MapScreen>
                       _createMarker(
                         context,
                         LatLng(18.222081, -71.124362),
-                        "Galletas dulce: 1 paquete de limon Wafer",
-                        "Alt: 1 paquete de fresa Wafer",
+                        "Galon de vinagre Blanco",
+                        "LAVANDERIA",
+                        "Alt:",
                         false,
                       ),
                       _createMarker(
                         context,
                         LatLng(18.222005, -71.124201),
                         "Pampitas: 1 Paquete, pequeñitas de 8 Oz",
+                        "DESPENSA",
                         "Alt: 1 Paquete, pequeñitas de 20 Oz",
                         false,
                       ),
@@ -164,14 +166,16 @@ class MapScreenState extends State<MapScreen>
                         context,
                         LatLng(18.222336, -71.124163),
                         "Queso Gouda Importado Rebanado: 2 unidades",
+                        "DESPENSA",
                         "Alt: No comprar",
                         true,
                       ),
                       _createMarker(
                         context,
                         LatLng(18.222336, -71.124463),
-                        "Mantequilla de Mani crujiente: 1",
-                        "Alt: Mermelada de fresa: 1",
+                        "Cornflake dulce marca la antorcha : 1 funda grande",
+                        "PROVISIONES",
+                        "Alt: ver opciones",
                         true,
                       ),
                     ],
@@ -193,8 +197,9 @@ class MapScreenState extends State<MapScreen>
   Marker _createMarker(
     BuildContext context,
     LatLng point,
-    String title,
-    String content,
+    String producto,
+    String categoria,
+    String altproducto,
     bool marked,
   ) {
     bool isSelected = selectedMarker == point;
@@ -213,14 +218,14 @@ class MapScreenState extends State<MapScreen>
                 elevation: 0,
                 behavior: SnackBarBehavior.floating,
                 duration: const Duration(days: 1),
-                margin: const EdgeInsets.only(bottom: 500, left: 20, right: 20),
-                content: _buildSnackBarContent(title, content, marked),
+                margin: const EdgeInsets.only(bottom: 400, left: 20, right: 20),
+                content: _buildSnackBarContent(producto, categoria, altproducto, marked),
               ),
             );
           }
         },
 
-        // 👇 Aquí va solo la parte visual del marcador
+        // Aquí va solo la parte visual del marcador
         child: AnimatedBuilder(
           animation: _animationController,
           builder: (context, child) {
@@ -254,7 +259,7 @@ class MapScreenState extends State<MapScreen>
     );
   }
 
-  Widget _buildSnackBarContent(String title, String content, bool marked) {
+  Widget _buildSnackBarContent(String producto, String categoria, String altproducto, bool marked) {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
@@ -266,32 +271,35 @@ class MapScreenState extends State<MapScreen>
         children: [
           Row(
             children: [
-              CircleAvatar(
-                radius: 25,
-                backgroundColor: const Color.fromARGB(255, 229, 236, 255),
-                child: Icon(
-                  marked ? Icons.check_circle : Icons.info,
-                  color: marked ? Colors.green : Colors.red,
-                ),
-              ),
-              const SizedBox(width: 10),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    Center(
+                      child: Text(
+                        categoria,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18.0,
+                        ),
+                      ),
+                    ),
+                     const SizedBox(height: 10),
                     Text(
-                      title,
+                      producto,
                       style: const TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
-                        fontSize: 18.0,
+                        fontSize: 20.0,
                       ),
                     ),
                     Text(
-                      content,
+                      altproducto,
                       style: const TextStyle(
-                        color: Colors.grey,
-                        fontSize: 16.0,
+                        color: Colors.cyanAccent,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20.0,
                       ),
                     ),
                   ],
